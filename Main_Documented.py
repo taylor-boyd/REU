@@ -82,8 +82,6 @@ def mergeAnds(ex, andNodes):
 def reconstruct(andNodes, orNodes, ex1):
     global andDict
     global orDict
-    # print(RenderTree(andDict[4]))
-    print(RenderTree(orDict[4]))
     tree = Node("THEN")
 
     for k in ex1:
@@ -138,30 +136,21 @@ def mainAlg(ex1, ex2):
 # ex1 = np.array([1,3,4])
 # ex2 = np.array([2,4,3])
 
-#case 3 -- works!!
+# case 3 -- works!!
 # ex1 = np.array([1,2,3,4,5])
 # ex2 = np.array([4,3,2,1,6])
 
-#OR case -- uhh
-ex1 = np.array([1,3])
-ex2 = np.array([2,4])
+# case 3.2 -- works!!
+ex1 = np.array([1,3,4,5,6])
+ex2 = np.array([2,6,5,4,3])
 
-#case 3.2 -- works!!
-# ex1 = np.array([1,3,4,5,6])
-# ex2 = np.array([2,6,5,4,3])
-
-#case 4 -- works!!
+# case 4 -- works!!
 # ex1 = np.array([1,2,3,4,5,6])
 # ex2 = np.array([4,3,2,1,6,5])
-
-#AND case -- hmm
-# ex1 = np.array([1,2,3,4])
-# ex2 = np.array([2,1,4,3])
 
 # case 4.2 -- works!!
 # ex1 = np.array([1,2,3,4,5,6])
 # ex2 = np.array([2,1,6,5,4,3])
-
 
 
 print("ex1: " + str(ex1))
@@ -172,8 +161,6 @@ global andDict
 while len(ex1) != 2:
     ex1, ex2, andNodes, orNodes = mainAlg(ex1, ex2)
     
-print("\n")
-# print(RenderTree(andDict[4]))    
 andNodes = andNodes.flatten()               # 'flattens' array, collapses it into one dimension
 tree = reconstruct(andNodes, orNodes, ex1)
 print("\n\nRECONSTRUCTED TREE: \n")
