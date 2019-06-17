@@ -84,11 +84,11 @@ def reconstruct(andNodes, orNodes, ex1):
     global orDict
     tree = Node("THEN")
 
-    for k in ex1:
-        if k in andDict:
-            if len(andDict) == 1 or k not in andNodes:
-                andDict[k].parent = tree
-            else:
+    for k in ex1:                                               # goes through ex1 task sequence (should only have 2 vals left)
+        if k in andDict:                                        # if val is in andDict
+            if len(andDict) == 1 or k not in andNodes:          # assumes 1 left is OR
+                andDict[k].parent = tree                        # adds AND pair/node to tree
+            else:                                               # more than one AND pair 
                 for i in range(0, andNodes.size-1,2):
                     node = Node("AND")
                     if(andNodes[i] in andDict):
@@ -99,8 +99,8 @@ def reconstruct(andNodes, orNodes, ex1):
                         andDict[andNodes[i+1]].parent = node
                     elif(andNodes[i+1] in orDict):
                         orDict[andNodes[i+1]].parent = node
-                    node.parent = tree
-        elif k in orDict:
+                    node.parent = tree                          # adds new node to tree
+        elif k in orDict:                                       # does same thing for OR
             if len(orDict) == 1 or k not in orNodes:
                 orDict[k].parent = tree
             else:
@@ -114,7 +114,7 @@ def reconstruct(andNodes, orNodes, ex1):
                         andDict[orNodes[i+1]].parent = node
                     elif(orNodes[i+1] in orDict):
                         orDict[orNodes[i+1]].parent = node 
-                node.parent = tree
+                node.parent = tree                              # might be redundant
     return tree
         
 def mainAlg(ex1, ex2):
