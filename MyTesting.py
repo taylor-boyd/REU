@@ -54,21 +54,41 @@ def findAndNodes(graph):
     # find pairs in graph where they exist in each others dest.
     for key in graph:
         for i in graph[key]:
-            if int(i) in graph:
-                if key in graph[int(i)]:
-                    if key not in andNodes:
-                        node = Node("AND")
-                        if i < key:
-                            andNodes = np.concatenate((andNodes, [[i, key]]), axis=0)  
-                            left = Node(i, parent=node)
-                            right = Node(key, parent=node)
-                        else:
-                            andNodes = np.concatenate((andNodes, [[key, i]]), axis=0)
-                            left = Node(key, parent=node)
-                            right = Node(i, parent=node)
-                        if i not in andDict:
-                            andDict[i] = node
+            if int(i) in graph and key in graph[int(i)]:
+                if key not in andNodes:
+                    node = Node("AND")
+                    if i < key:
+                        andNodes = np.concatenate((andNodes, [[i, key]]), axis=0)  
+                        left = Node(i, parent=node)
+                        right = Node(key, parent=node)
+                    else:
+                        andNodes = np.concatenate((andNodes, [[key, i]]), axis=0)
+                        left = Node(key, parent=node)
+                        right = Node(i, parent=node)        
+                    if i not in andDict:
+                        andDict[i] = node
     return andNodes
+
+def indexCheck(ex1, ex2, andNodes, orNodes):
+    global andDict
+    global orDict
+
+    for key in andDict:
+        for j in ex1:
+            if j == key.left or j == key.right:
+                index1 += j
+        for i in ex2:
+            if i == key.left or i == key.right:
+                index2 += i
+        if index1 != index2:
+            if (index1 - index2) == 2 or (index2 - index1) == 2:
+                index1 = 0              # just put this to get rid of error
+                # AND of AND and OR case
+            # AND of AND and AND case
+
+#    look up how to access node vals with anytree
+#    add in orDict part
+    return andNodes, orNodes
 
 def mergeAnds(ex, andNodes):
     andNodesNew = np.array([])
@@ -83,49 +103,8 @@ def reconstruct(andNodes, orNodes, ex1):
     global orDict
     
     tree = Node("THEN")
-    for i in range(0, andNodes.size-1,2):
-        node = Node("AND")
-        if(andNodes[i] in andDict):
-            andDict[andNodes[i]].parent = node
-        elif(andNodes[i] in orDict):
-            orDict[andNodes[i]].parent = node
-        if(andNodes[i+1] in andDict):
-            andDict[andNodes[i+1]].parent = node
-        elif(andNodes[i+1] in orDict):
-            orDict[andNodes[i+1]].parent = node
-        node.parent = tree
-    
-#     for k in ex1:
-#         if k in andDict:
-#             if len(andDict) == 1 or k not in andNodes:
-#                 andDict[k].parent = tree
-#             else:
-#                 for i in range(0, andNodes.size-1,2):
-#                     node = Node("AND")
-#                     if(andNodes[i] in andDict):
-#                         andDict[andNodes[i]].parent = node
-#                     elif(andNodes[i] in orDict):
-#                         orDict[andNodes[i]].parent = node
-#                     if(andNodes[i+1] in andDict):
-#                         andDict[andNodes[i+1]].parent = node
-#                     elif(andNodes[i+1] in orDict):
-#                         orDict[andNodes[i+1]].parent = node
-#                     node.parent = tree
-#         elif k in orDict:
-#             if len(orDict) == 1 or k not in orNodes:
-#                 orDict[k].parent = tree
-#             else:
-#                 for i in range(0, orNodes.size-1,2):
-#                     node = Node("OR", parent = tree)
-#                     if(orNodes[i] in andDict):
-#                         andDict[orNodes[i]].parent = node
-#                     elif(orNodes[i] in orDict):
-#                         orDict[orNodes[i]].parent = node
-#                     if(orNodes[i+1] in andDict):
-#                         andDict[orNodes[i+1]].parent = node
-#                     elif(orNodes[i+1] in orDict):
-#                         orDict[orNodes[i+1]].parent = node 
-#                 node.parent = tree
+#    Should look at values and decide whether andDict node or orDict node should be added first
+#    Because of indexCheck, only two nodes should be added and then that's it
     return tree
         
 def mainAlg(ex1, ex2):
@@ -133,8 +112,11 @@ def mainAlg(ex1, ex2):
     ex2 = replaceOrNodes(ex2, orNodes)
     graph = initGraph(ex1, ex2)
     andNodes = findAndNodes(graph)
-    ex1, tempAnds = mergeAnds(ex1, andNodes)
-    ex2, andNodes = mergeAnds(ex2, andNodes)
+    print(RenderTree(andDict[2]))
+    print(RenderTree(andDict[4]))
+    andNodes, orNodes = indexCheck(ex1, ex2, andNodes, orNodes)
+    # ex1, tempAnds = mergeAnds(ex1, andNodes)
+    # ex2, andNodes = mergeAnds(ex2, andNodes)
     return ex1, ex2, andNodes, orNodes
 
 
@@ -181,21 +163,10 @@ print("ex2: " + str(ex2))
 
 global andDict
 
-while len(ex1) != 2:
-    ex1, ex2, andNodes, orNodes = mainAlg(ex1, ex2)
-    print(ex1)
-    print("And Nodes:")
-    print(andNodes)
-    print("ex1: ")
-    print(ex1)
-    print("ex2: ")
-    print(ex2)
-#     print(andNodes)
+# while len(ex1) != 2:
+ex1, ex2, andNodes, orNodes = mainAlg(ex1, ex2)
 
-print(andDict)
 andNodes = andNodes.flatten()
-print(andNodes)
-print(RenderTree(andDict[4]))
 tree = reconstruct(andNodes, orNodes, ex1)
 print("\n\nRECONSTRUCTED TREE: \n")
 print(RenderTree(tree))
