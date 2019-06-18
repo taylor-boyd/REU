@@ -74,20 +74,55 @@ def indexCheck(ex1, ex2, andNodes, orNodes):
     global orDict
 
     for key in andDict:
-        for j in ex1:
-            if j == key.left or j == key.right:
-                index1 += j
-        for i in ex2:
-            if i == key.left or i == key.right:
+        index1 = 0
+        index2 = 0
+        index3 = 0
+        index4 = 0
+        print(andDict)
+        for i in range(0,ex1.size-1):
+            if ex1[i] in andDict[key].children:
+                index1 += i
+                print(index1)
+            if ex2[i] in andDict[key].children:
                 index2 += i
+                print(index2)
         if index1 != index2:
+            newNode = Node("AND")
+            newLeft = andDict[key]
+            newLeft.parent = newNode
             if (index1 - index2) == 2 or (index2 - index1) == 2:
-                index1 = 0              # just put this to get rid of error
                 # AND of AND and OR case
-            # AND of AND and AND case
+                # how do we figure out which OR to add
+                # need to update orDict
+                for key2 in orDict:
+                    for j in range(0,ex1.size-1):
+                        if ex1[j] in orDict[key2].children:
+                            index3 += j
+                        if ex2[j] in orDict[key2].children:
+                            index4 += j
+                    if index3 != index4:
+                        if (index3 - index4) == 2 or (index4 - index3) == 2:
+                            newRight = orDict[key2]
+                            newRight.parent = newNode   
+                            del orDict[key2] 
+                            break                    
+            else:
+                # AND of AND and AND case
+                # how do we access next key for right node
+                # update andDict
+                if (index1 - index2) == 4 or (index2 - index1) == 4:
+                    newRight = andDict[key+2]
+                    newRight.parent = newNode
+                    del andDict[key+2]
+            andDict[key] = newNode
+#    for key in orDict:
+#        for i in orDict[key]:
+#            index1 += np.argwhere(ex1==i[0])
+#            index2 += np.argwhere(ex2==i[0])
+#        if index1 != index2:
+#            newNode = Node("OR")
+#            newLeft = orDict[key]
 
-#    look up how to access node vals with anytree
-#    add in orDict part
     return andNodes, orNodes
 
 def mergeAnds(ex, andNodes):
@@ -109,12 +144,13 @@ def reconstruct(andNodes, orNodes, ex1):
         
 def mainAlg(ex1, ex2):
     orNodes = findOrNodes(ex1, ex2)
-    ex2 = replaceOrNodes(ex2, orNodes)
+    #ex2 = replaceOrNodes(ex2, orNodes)
     graph = initGraph(ex1, ex2)
     andNodes = findAndNodes(graph)
-    print(RenderTree(andDict[2]))
-    print(RenderTree(andDict[4]))
+    #print(RenderTree(andDict[2]))
+    #print(RenderTree(andDict[4]))
     andNodes, orNodes = indexCheck(ex1, ex2, andNodes, orNodes)
+    # print andDict trees again to see how they changed
     # ex1, tempAnds = mergeAnds(ex1, andNodes)
     # ex2, andNodes = mergeAnds(ex2, andNodes)
     return ex1, ex2, andNodes, orNodes
@@ -150,13 +186,16 @@ def mainAlg(ex1, ex2):
 # ex2 = np.array([2,4])
 
 # case 5 -- two and's -- does not work 
-ex1 = np.array([1,2,3,4])
-ex2 = np.array([2,1,4,3])
+# ex1 = np.array([1,2,3,4])
+# ex2 = np.array([2,1,4,3])
 
 #case 2 -- how do we get this to work???
 # ex1 = np.array([1,2,3,4])
 # ex2 = np.array([3,2,1,5])
 
+# new case
+ex1 = np.array([1,2,3,5])
+ex2 = np.array([4,2,1,6])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
@@ -171,40 +210,18 @@ tree = reconstruct(andNodes, orNodes, ex1)
 print("\n\nRECONSTRUCTED TREE: \n")
 print(RenderTree(tree))
 
-
 #%%
 ex1, ex2, andNodes, orNodes = mainAlg(ex1, ex2)
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
+print('\n')
 print(andNodes)
+print('\n')
 print(orNodes)
-
+print('\n')
 for i in andDict:
     print(andDict[i].children)
+print('\n')
 print(andDict)
 
-
 #%%
-ex1, ex2, andNodes, orNodes = mainAlg(ex1, ex2)
-print("ex1: " + str(ex1))
-print("ex2: " + str(ex2))
-print(andNodes)
-print(orNodes)
-
-for i in andDict:
-    print(andDict[i].children)
-print(andDict)
-
-
-#%%
-
-
-
-#%%
-
-
-
-#%%
-
-
-
