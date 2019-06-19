@@ -73,21 +73,19 @@ def andBuilding(ex1, ex2):
     global andDict
     global orDict
 
+    delKey1 = delKey2 = 10
     for key in andDict:
         index1 = index2 = index3 = index4 = 0
         for i in range(0,ex1.size-1):
             for j in andDict[key].children:
                 if ex1[i] == j.name:
                     index1 += i
-                    print(index1)
                 if ex2[i] == j.name:
                     index2 += i
-                    print(index2)
         if index1 != index2:
             newNode = Node("AND")
             newLeft = andDict[key]
             newLeft.parent = newNode
-            print('\n')
             if (index1 - index2) == 2 or (index2 - index1) == 2:
                 for key2 in orDict:
                     for i2 in range(0,ex1.size-1):
@@ -98,32 +96,57 @@ def andBuilding(ex1, ex2):
                     if index3 != index4:
                         if (index3 - index4) == 2 or (index4 - index3) == 2:
                             newRight = orDict[key2]
-                            newRight.parent = newNode   
-                            del orDict[key2] 
-                            break                    
+                            newRight.parent = newNode
+                            delKey2 = key2   
+                            break         
             else:
                 if (index1 - index2) == 4 or (index2 - index1) == 4:
-                    newRight = andDict[key+2]
-                    newRight.parent = newNode
-                    del andDict[key+2]
-            andDict[key] = newNode  
+                    nextKey = key+2
+                    if nextKey in andDict:
+                        newRight = andDict[nextKey]
+                        newRight.parent = newNode
+                        delKey1 = nextKey
+            andDict[key] = newNode
+            break
+    if delKey1 != 10:
+        del andDict[delKey1]
+    elif delKey2 != 10:
+        del orDict[delKey2]
     return ex1, ex2
-
-def mergeAnds(ex, andNodes):
-    andNodesNew = np.array([])
-    for i in andNodes:
-        index = np.argwhere(ex==i[0])
-        ex = np.delete(ex, index)
-        andNodesNew = np.append(andNodesNew, int(i[1]))
-    return (ex, andNodesNew)
 
 def reconstruct(andNodes, orNodes, ex1):
     global andDict
     global orDict
     
     tree = Node("THEN")
-    # Look for ORs in ANDs using andNodes
-    
+
+    # add ANDs to tree
+    for key in andDict:
+        if np.isin(key, orNodes):
+            parentNode = Node("AND")
+            node1 = orDict[key]
+            node1.parent = parentNode
+            del orDict[key]
+            for i in andNodes:
+                if not np.isin(i, orNodes):
+                    if (key - i) == 1 or (i - key) == 1:
+                        node2 = Node("AND", parent=parentNode)
+                        left = Node(i, parent=node2)
+                        j = i-1
+                        k = i+1
+                        if not np.isin(j, orNodes):
+                            right = Node(j, parent=node2)
+                        if not np.isin(k, orNodes):
+                            right = Node(k, parent=node2)
+                        parentNode.parent = tree
+        else:
+            node = andDict[key]
+            node.parent = tree
+
+    # add ORs to tree
+    for key in orDict:
+        node = orDict[key]
+        node.parent = tree
 
     return tree
         
@@ -133,51 +156,30 @@ def mainAlg(ex1, ex2):
     graph = initGraph(ex1, ex2)
     andNodes = findAndNodes(graph)
     ex1, ex2 = andBuilding(ex1, ex2)
-    #ex1, tempAnds = mergeAnds(ex1, andNodes)
-    #ex2, andNodes = mergeAnds(ex2, andNodes)
     return ex1, ex2, andNodes, orNodes
 
 
 #%%
+
+### AND-AND/AND-AND/OR cases ###
+
 # case 1 -- works!!
-# ex1 = np.array([1,2,3])
-# ex2 = np.array([2,1,4])
+# ex1 = np.array([1,2,3,5])
+# ex2 = np.array([4,2,1,6])
 
-# case 1.2 -- works!!
-# ex1 = np.array([1,3,4])
-# ex2 = np.array([2,4,3])
+# case 2 -- works!!
+# ex1 = np.array([1,3,2,5])
+# ex2 = np.array([2,4,1,6])
 
-#case 3 -- works!!
+### AND-AND/AND-AND/AND cases ###
+
+# case 1 -- works!!
 # ex1 = np.array([1,2,3,4,5])
 # ex2 = np.array([4,3,2,1,6])
 
-#case 3.2 -- works!!
-# ex1 = np.array([1,3,4,5,6])
-# ex2 = np.array([2,6,5,4,3])
-
-# case 4 -- works!!
-# ex1 = np.array([1,2,3,4,5,6])
-# ex2 = np.array([4,3,2,1,6,5])
-
-# case 4.2 -- works!!
-# ex1 = np.array([1,2,3,4,5,6])
-# ex2 = np.array([2,1,6,5,4,3])
-
-# case 5 -- two or's - not werkin
-# ex1 = np.array([1,3])
-# ex2 = np.array([2,4])
-
-# case 5 -- two and's -- does not work 
-# ex1 = np.array([1,2,3,4])
-# ex2 = np.array([2,1,4,3])
-
-#case 2 -- how do we get this to work???
-# ex1 = np.array([1,2,3,4])
-# ex2 = np.array([3,2,1,5])
-
-# new case
-ex1 = np.array([1,2,3,5])
-ex2 = np.array([4,2,1,6])
+# case 2 -- gotta work on it
+ex1 = np.array([1,3,2,4,5])
+ex2 = np.array([4,2,3,1,6])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
@@ -203,10 +205,12 @@ print(orNodes)
 print('\n')
 print(andDict)
 print('\n')
+print(orDict)
+print('\n')
 for i in andDict:
     print(andDict[i].children)
 print('\n')
-print(RenderTree(andDict[2]))
-print(RenderTree(orDict[5]))
+#print(RenderTree(andDict[2]))
+#print(RenderTree(orDict[5]))
 
 #%%
