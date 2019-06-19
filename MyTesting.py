@@ -69,37 +69,32 @@ def findAndNodes(graph):
                         andDict[i] = node
     return andNodes
 
-def indexCheck(ex1, ex2, andNodes, orNodes):
+def andBuilding(ex1, ex2):
     global andDict
     global orDict
 
     for key in andDict:
-        index1 = 0
-        index2 = 0
-        index3 = 0
-        index4 = 0
-        print(andDict)
+        index1 = index2 = index3 = index4 = 0
         for i in range(0,ex1.size-1):
-            if ex1[i] in andDict[key].children:
-                index1 += i
-                print(index1)
-            if ex2[i] in andDict[key].children:
-                index2 += i
-                print(index2)
+            for j in andDict[key].children:
+                if ex1[i] == j.name:
+                    index1 += i
+                    print(index1)
+                if ex2[i] == j.name:
+                    index2 += i
+                    print(index2)
         if index1 != index2:
             newNode = Node("AND")
             newLeft = andDict[key]
             newLeft.parent = newNode
+            print('\n')
             if (index1 - index2) == 2 or (index2 - index1) == 2:
-                # AND of AND and OR case
-                # how do we figure out which OR to add
-                # need to update orDict
                 for key2 in orDict:
-                    for j in range(0,ex1.size-1):
-                        if ex1[j] in orDict[key2].children:
-                            index3 += j
-                        if ex2[j] in orDict[key2].children:
-                            index4 += j
+                    for i2 in range(0,ex1.size-1):
+                        if ex1[i2] == key2:
+                            index3 += i2
+                        if ex2[i2] == key2:
+                            index4 += i2
                     if index3 != index4:
                         if (index3 - index4) == 2 or (index4 - index3) == 2:
                             newRight = orDict[key2]
@@ -107,23 +102,12 @@ def indexCheck(ex1, ex2, andNodes, orNodes):
                             del orDict[key2] 
                             break                    
             else:
-                # AND of AND and AND case
-                # how do we access next key for right node
-                # update andDict
                 if (index1 - index2) == 4 or (index2 - index1) == 4:
                     newRight = andDict[key+2]
                     newRight.parent = newNode
                     del andDict[key+2]
-            andDict[key] = newNode
-#    for key in orDict:
-#        for i in orDict[key]:
-#            index1 += np.argwhere(ex1==i[0])
-#            index2 += np.argwhere(ex2==i[0])
-#        if index1 != index2:
-#            newNode = Node("OR")
-#            newLeft = orDict[key]
-
-    return andNodes, orNodes
+            andDict[key] = newNode  
+    return ex1, ex2
 
 def mergeAnds(ex, andNodes):
     andNodesNew = np.array([])
@@ -138,21 +122,19 @@ def reconstruct(andNodes, orNodes, ex1):
     global orDict
     
     tree = Node("THEN")
-#    Should look at values and decide whether andDict node or orDict node should be added first
-#    Because of indexCheck, only two nodes should be added and then that's it
+    # Look for ORs in ANDs using andNodes
+    
+
     return tree
         
 def mainAlg(ex1, ex2):
     orNodes = findOrNodes(ex1, ex2)
-    #ex2 = replaceOrNodes(ex2, orNodes)
+    ex2 = replaceOrNodes(ex2, orNodes)
     graph = initGraph(ex1, ex2)
     andNodes = findAndNodes(graph)
-    #print(RenderTree(andDict[2]))
-    #print(RenderTree(andDict[4]))
-    andNodes, orNodes = indexCheck(ex1, ex2, andNodes, orNodes)
-    # print andDict trees again to see how they changed
-    # ex1, tempAnds = mergeAnds(ex1, andNodes)
-    # ex2, andNodes = mergeAnds(ex2, andNodes)
+    ex1, ex2 = andBuilding(ex1, ex2)
+    #ex1, tempAnds = mergeAnds(ex1, andNodes)
+    #ex2, andNodes = mergeAnds(ex2, andNodes)
     return ex1, ex2, andNodes, orNodes
 
 
@@ -211,7 +193,7 @@ print("\n\nRECONSTRUCTED TREE: \n")
 print(RenderTree(tree))
 
 #%%
-ex1, ex2, andNodes, orNodes = mainAlg(ex1, ex2)
+#ex1, ex2, andNodes, orNodes = mainAlg(ex1, ex2)
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
 print('\n')
@@ -219,9 +201,12 @@ print(andNodes)
 print('\n')
 print(orNodes)
 print('\n')
+print(andDict)
+print('\n')
 for i in andDict:
     print(andDict[i].children)
 print('\n')
-print(andDict)
+print(RenderTree(andDict[2]))
+print(RenderTree(orDict[5]))
 
 #%%
