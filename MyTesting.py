@@ -102,10 +102,15 @@ def andBuilding(ex1, ex2):
             else:
                 if (index1 - index2) == 4 or (index2 - index1) == 4:
                     nextKey = key+2
+                    nextKey2 = key+1
                     if nextKey in andDict:
                         newRight = andDict[nextKey]
                         newRight.parent = newNode
                         delKey1 = nextKey
+                    if nextKey2 in andDict:
+                        newRight = andDict[nextKey2]
+                        newRight.parent = newNode
+                        delKey1 = nextKey2
             andDict[key] = newNode
             break
     if delKey1 != 10:
@@ -161,7 +166,7 @@ def mainAlg(ex1, ex2):
 
 #%%
 
-### AND-AND/AND-AND/OR cases ###
+### AND-AND/AND-AND/OR, OR cases ###
 
 # case 1 -- works!!
 # ex1 = np.array([1,2,3,5])
@@ -171,15 +176,33 @@ def mainAlg(ex1, ex2):
 # ex1 = np.array([1,3,2,5])
 # ex2 = np.array([2,4,1,6])
 
-### AND-AND/AND-AND/AND cases ###
+# case 3 -- gotta work on it
+ex1 = np.array([1,3,4,5])
+ex2 = np.array([2,6,4,3])
+
+### AND-AND/AND-AND/AND, OR cases ###
 
 # case 1 -- works!!
 # ex1 = np.array([1,2,3,4,5])
 # ex2 = np.array([4,3,2,1,6])
 
+# case 2 -- works!!
+# ex1 = np.array([1,3,2,4,5])
+# ex2 = np.array([4,2,3,1,6])
+
+# case 3 -- gotta work on it
+# ex1 = np.array([1,3,4,5,6])
+# ex2 = np.array([2,6,5,4,3])
+
+### AND-AND/AND-AND/AND, AND cases ###
+
+# case 1 -- works!!
+# ex1 = np.array([1,2,3,4,5,6])
+# ex2 = np.array([4,3,2,1,6,5])
+
 # case 2 -- gotta work on it
-ex1 = np.array([1,3,2,4,5])
-ex2 = np.array([4,2,3,1,6])
+# ex1 = np.array([1,2,3,4,5,6])
+# ex2 = np.array([2,1,6,5,4,3])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
@@ -194,23 +217,5 @@ tree = reconstruct(andNodes, orNodes, ex1)
 print("\n\nRECONSTRUCTED TREE: \n")
 print(RenderTree(tree))
 
-#%%
-#ex1, ex2, andNodes, orNodes = mainAlg(ex1, ex2)
-print("ex1: " + str(ex1))
-print("ex2: " + str(ex2))
-print('\n')
-print(andNodes)
-print('\n')
-print(orNodes)
-print('\n')
-print(andDict)
-print('\n')
-print(orDict)
-print('\n')
-for i in andDict:
-    print(andDict[i].children)
-print('\n')
-#print(RenderTree(andDict[2]))
-#print(RenderTree(orDict[5]))
 
 #%%
