@@ -72,16 +72,16 @@ def findAndNodes(graph):
 def andBuilding(ex1, ex2):
     global andDict
     global orDict
-
+    print(RenderTree(andDict[4]))
     delKey1 = delKey2 = 10
     for key in andDict:
         index1 = index2 = index3 = index4 = 0
-        for i in range(0,ex1.size-1):
-            for j in andDict[key].children:
-                if ex1[i] == j.name:
-                    index1 += i
-                if ex2[i] == j.name:
-                    index2 += i
+        for i in andDict[key].children:         # I switched these
+            for j in range(0,ex1.size):
+                if ex1[j] == i.name:
+                    index1 += j
+                if ex2[j] == i.name:
+                    index2 += j
         if index1 != index2:
             newNode = Node("AND")
             newLeft = andDict[key]
@@ -93,6 +93,8 @@ def andBuilding(ex1, ex2):
                             index3 += i2
                         if ex2[i2] == key2:
                             index4 += i2
+                    print(index3)
+                    print(index4)
                     if index3 != index4:
                         if (index3 - index4) == 2 or (index4 - index3) == 2:
                             newRight = orDict[key2]
@@ -127,31 +129,34 @@ def reconstruct(andNodes, orNodes, ex1):
 
     # add ANDs to tree
     for key in andDict:
-        if np.isin(key, orNodes):
-            parentNode = Node("AND")
-            node1 = orDict[key]
-            node1.parent = parentNode
-            del orDict[key]
-            for i in andNodes:
-                if not np.isin(i, orNodes):
-                    if (key - i) == 1 or (i - key) == 1:
-                        node2 = Node("AND", parent=parentNode)
-                        left = Node(i, parent=node2)
-                        j = i-1
-                        k = i+1
-                        if not np.isin(j, orNodes):
-                            right = Node(j, parent=node2)
-                        if not np.isin(k, orNodes):
-                            right = Node(k, parent=node2)
-                        parentNode.parent = tree
-        else:
-            node = andDict[key]
-            node.parent = tree
-
-    # add ORs to tree
-    for key in orDict:
-        node = orDict[key]
-        node.parent = tree
+        for key2 in orDict:
+            if key > key2 and not np.isin(key, orNodes):
+                node = orDict[key2]
+                node.parent = tree
+            else:
+                if key > key2:
+                    node = orDict[key2]
+                    node.parent = tree
+                elif np.isin(key, orNodes):
+                    parentNode = Node("AND")
+                    node1 = orDict[key]
+                    node1.parent = parentNode
+                    # del orDict[key]
+                    for i in andNodes:
+                        if not np.isin(i, orNodes):
+                            if (key - i) == 1 or (i - key) == 1:
+                                node2 = Node("AND", parent=parentNode)
+                                left = Node(i, parent=node2)
+                                j = i-1
+                                k = i+1
+                                if not np.isin(j, orNodes):
+                                    right = Node(j, parent=node2)
+                                if not np.isin(k, orNodes):
+                                    right = Node(k, parent=node2)
+                                parentNode.parent = tree
+                else:
+                    node = andDict[key]
+                    node.parent = tree
 
     return tree
         
@@ -180,6 +185,10 @@ def mainAlg(ex1, ex2):
 ex1 = np.array([1,3,4,5])
 ex2 = np.array([2,6,4,3])
 
+# case 4 -- works!!
+# ex1 = np.array([1,3,5,4])
+# ex2 = np.array([2,4,6,3])
+
 ### AND-AND/AND-AND/AND, OR cases ###
 
 # case 1 -- works!!
@@ -193,6 +202,10 @@ ex2 = np.array([2,6,4,3])
 # case 3 -- gotta work on it
 # ex1 = np.array([1,3,4,5,6])
 # ex2 = np.array([2,6,5,4,3])
+
+# case 4 -- gotta work on it
+# ex1 = np.array([1,3,5,4,6])
+# ex2 = np.array([2,4,6,3,5])
 
 ### AND-AND/AND-AND/AND, AND cases ###
 
