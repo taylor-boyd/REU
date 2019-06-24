@@ -67,12 +67,16 @@ def findAndNodes(graph):
                         right = Node(i, parent=node)        
                     if i not in andDict:
                         andDict[i] = node
+    # checks for special case (AND-AND/AND-AND/AND, OR case 4)
+    #if not any(andDict):
+    #   for key in graph:
+            
     return andNodes
 
 def andBuilding(ex1, ex2):
     global andDict
     global orDict
-
+    
     delKey1 = delKey2 = 10
     for key in andDict:
         index1 = index2 = index3 = index4 = 0
@@ -98,6 +102,7 @@ def andBuilding(ex1, ex2):
                             newRight = orDict[key2]
                             newRight.parent = newNode
                             delKey2 = key2        
+                            break
             else:
                 if (index1 - index2) == 4 or (index2 - index1) == 4:
                     nextKey = key+2
@@ -111,6 +116,7 @@ def andBuilding(ex1, ex2):
                         newRight.parent = newNode
                         delKey1 = nextKey2
             andDict[key] = newNode
+            break
     if delKey1 != 10:
         del andDict[delKey1]
     elif delKey2 != 10:
@@ -123,46 +129,51 @@ def reconstruct(andNodes, orNodes, ex1):
     global orDict
     
     tree = Node("THEN")
-
-    print(andDict)
-    print(orDict)
-
+    
     delKey1 = delKey2 = 10
-    #while len(andDict.keys()) != 0 and len(orDict.keys()) != 0:     #just added this
-        for key in andDict:
-            for key2 in orDict:
-                if key > key2 and not np.isin(key, orNodes):
+    for key in andDict:
+        for key2 in orDict:
+            if key > key2 and not np.isin(key, orNodes):
+                node = orDict[key2]
+                node.parent = tree
+                delkey1 = key2
+            else:
+                if key > key2:
                     node = orDict[key2]
                     node.parent = tree
+                    delKey1 = key2
+                elif np.isin(key, orNodes):
+                    parentNode = Node("AND")
+                    node1 = orDict[key]
+                    node1.parent = parentNode
+                    delKey1 = delKey2 = key
+                    for i in andNodes:
+                        if not np.isin(i, orNodes):
+                            if (key - i) == 1 or (i - key) == 1:
+                                node2 = Node("AND", parent=parentNode)
+                                left = Node(i, parent=node2)
+                                j = i-1
+                                k = i+1
+                                if not np.isin(j, orNodes):
+                                    right = Node(j, parent=node2)
+                                if not np.isin(k, orNodes):
+                                    right = Node(k, parent=node2)
+                                parentNode.parent = tree
+                    break
                 else:
-                    if key > key2:
-                        node = orDict[key2]
-                        node.parent = tree
-                    elif np.isin(key, orNodes):
-                        parentNode = Node("AND")
-                        node1 = orDict[key]
-                        node1.parent = parentNode
-                        delKey1 = key
-                        for i in andNodes:
-                            if not np.isin(i, orNodes):
-                                if (key - i) == 1 or (i - key) == 1:
-                                    node2 = Node("AND", parent=parentNode)
-                                    left = Node(i, parent=node2)
-                                    j = i-1
-                                    k = i+1
-                                    if not np.isin(j, orNodes):
-                                        right = Node(j, parent=node2)
-                                    if not np.isin(k, orNodes):
-                                        right = Node(k, parent=node2)
-                                    parentNode.parent = tree
-                    else:
-                        node = andDict[key]
-                        node.parent = tree
-
-    #if delKey1 != 10:
-     #   del orDict[delKey1]
-    #if delKey2 != 10:
-
+                    node = andDict[key]
+                    node.parent = tree
+                    delKey2 = key
+    if delKey1 != 10:
+        del orDict[delKey1]
+    if delKey2 != 10:
+        del andDict[delKey2]
+    for key in orDict:
+        node = orDict[key]
+        node.parent = tree
+    for key in andDict:
+        node = andDict[key]
+        node.parent = tree
 
     return tree
         
@@ -187,13 +198,13 @@ def mainAlg(ex1, ex2):
 # ex1 = np.array([1,3,2,5])
 # ex2 = np.array([2,4,1,6])
 
-# case 3 -- gotta work on it
+# case 3 -- works!!
 # ex1 = np.array([1,3,4,5])
 # ex2 = np.array([2,6,4,3])
 
 # case 4 -- works!!
-ex1 = np.array([1,3,5,4])
-ex2 = np.array([2,4,6,3])
+# ex1 = np.array([1,3,5,4])
+# ex2 = np.array([2,4,6,3])
 
 ### AND-AND/AND-AND/AND, OR cases ###
 
@@ -205,13 +216,13 @@ ex2 = np.array([2,4,6,3])
 # ex1 = np.array([1,3,2,4,5])
 # ex2 = np.array([4,2,3,1,6])
 
-# case 3 -- gotta work on it
+# case 3 -- works!!
 # ex1 = np.array([1,3,4,5,6])
 # ex2 = np.array([2,6,5,4,3])
 
 # case 4 -- gotta work on it
-# ex1 = np.array([1,3,5,4,6])
-# ex2 = np.array([2,4,6,3,5])
+ex1 = np.array([1,3,5,4,6])
+ex2 = np.array([2,4,6,3,5])
 
 ### AND-AND/AND-AND/AND, AND cases ###
 
@@ -219,7 +230,7 @@ ex2 = np.array([2,4,6,3])
 # ex1 = np.array([1,2,3,4,5,6])
 # ex2 = np.array([4,3,2,1,6,5])
 
-# case 2 -- gotta work on it
+# case 2 -- works!!
 # ex1 = np.array([1,2,3,4,5,6])
 # ex2 = np.array([2,1,6,5,4,3])
 
