@@ -68,8 +68,25 @@ def findAndNodes(graph):
                     if i not in andDict:
                         andDict[i] = node
     # checks for special case (AND-AND/AND-AND/AND, OR case 4)
-    #if not any(andDict):
-    #   for key in graph:
+    if not any(andDict):
+        for key in graph:
+            keyVals = np.empty((0,3), int)
+            for i in graph[key]:
+                if i > 0 and key > 0:
+                    if not np.isin(i, keyVals):
+                        keyVals = np.append(keyVals, i)
+                    else:
+                        node = Node("AND")
+                        if i < key:
+                            andNodes = np.concatenate((andNodes, [[i, key]]), axis=0)
+                            left = Node(i, parent=node)
+                            right = Node(key, parent=node)
+                        else:
+                            andNodes = np.concatenate((andNodes, [[key, i]]), axis=0)
+                            left = Node(key, parent=node)
+                            right = Node(i, parent=node)
+                        if i not in andDict:
+                            andDict[i] = node
             
     return andNodes
 
@@ -220,9 +237,9 @@ def mainAlg(ex1, ex2):
 # ex1 = np.array([1,3,4,5,6])
 # ex2 = np.array([2,6,5,4,3])
 
-# case 4 -- gotta work on it
-ex1 = np.array([1,3,5,4,6])
-ex2 = np.array([2,4,6,3,5])
+# case 4 -- works!!
+# ex1 = np.array([1,3,5,4,6])
+# ex2 = np.array([2,4,6,3,5])
 
 ### AND-AND/AND-AND/AND, AND cases ###
 
@@ -231,8 +248,8 @@ ex2 = np.array([2,4,6,3,5])
 # ex2 = np.array([4,3,2,1,6,5])
 
 # case 2 -- works!!
-# ex1 = np.array([1,2,3,4,5,6])
-# ex2 = np.array([2,1,6,5,4,3])
+ex1 = np.array([1,2,3,4,5,6])
+ex2 = np.array([2,1,6,5,4,3])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
