@@ -179,8 +179,7 @@ def orBuilding(ex1, ex2, orNodes):
             orNodes = np.delete(orNodes, delKey2+1)
             orNodes = np.delete(orNodes, delKey2)
         for i in orNodes:
-            if not np.isin(i-1, orDict) and not np.isin(i-1, keys):
-                print(orDict.values())
+            if not np.isin(i-1, orDict) and not np.isin(i-1, keys) and not np.isin(i-1, andNodes):
                 node = Node("OR", parent=orDict[keys[0]])
                 left = Node(i-1, parent=node)
                 right = Node(i, parent=node)
@@ -347,11 +346,19 @@ def mainAlg(ex1, ex2):
 # ex1 = np.array([1,2,5])
 # ex2 = np.array([3,6])
 
+# case 2 -- works!!
+# ex1 = np.array([1,2,5,6])
+# ex2 = np.array([2,1,3])
+
 ### OR-OR/AND-OR/AND, OR cases ###
 
 # case 1 -- works!!
-ex1 = np.array([1,2,5])
-ex2 = np.array([3,4,6])
+# ex1 = np.array([1,2,5])
+# ex2 = np.array([3,4,6])
+
+# case 2 -- 3 OR method won't work with AND
+ex1 = np.array([1,2,3,4])
+ex2 = np.array([2,1,6,5])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
