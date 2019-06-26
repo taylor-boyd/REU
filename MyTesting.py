@@ -30,7 +30,7 @@ def findOrNodes(ex1, ex2):
 
 def replaceOrNodes(ex, orNodes, ex1):
     for i in range(0,orNodes.size-1):
-        if (orNodes[i+1] - orNodes[i]) == 1 and len(ex1) == len(ex): # precaution for OR cases
+        if (orNodes[i+1] - orNodes[i]) == 1 and len(ex1) == len(ex) and len(orDict.keys()) != 3: # precaution for OR cases
             ex = np.where(ex==orNodes[i+1], int(orNodes[i]), ex)
     return ex
 
@@ -201,6 +201,26 @@ def orBuilding(ex1, ex2, orNodes):
                 left2 = Node(orPairs[1].name, parent=node2)
                 right2 = Node((orPairs[1].name)+1, parent=node2)
                 orDict[orPairs[0].name] = newNode
+        if len(orDict.keys()) == 3:
+            newNode = Node("OR")
+            for i in range(0, orNodes.size-1):
+                if np.isin(orNodes[i], ex1) and np.isin(orNodes[i+1], ex1):
+                    node = Node("AND", parent=newNode)
+                    left = Node(orNodes[i], parent=node)
+                    right = Node(orNodes[i+1], parent=node)
+                    delKey = i
+                elif np.isin(orNodes[i], ex2) and np.isin(orNodes[i+1], ex2):
+                    node = Node("AND", parent=newNode)
+                    left = Node(orNodes[i], parent=node)
+                    right = Node(orNodes[i+1], parent=node)
+                    delKey2 = i
+            orDict[orNodes[delKey]] = newNode
+            del orDict[delKey2+1]
+            orNodes = np.delete(orNodes, delKey+1)
+            orNodes = np.delete(orNodes, delKey)
+            orNodes = np.delete(orNodes, delKey2+1)
+            orNodes = np.delete(orNodes, delKey2)
+
 
     return orNodes
 
@@ -323,15 +343,15 @@ def mainAlg(ex1, ex2):
 
 ### OR-OR/OR-OR/AND, OR cases ###
 
-# case 1 -- we'll see
-ex1 = np.array([1,2,5])
-ex2 = np.array([3,6])
+# case 1 -- works!!
+# ex1 = np.array([1,2,5])
+# ex2 = np.array([3,6])
 
 ### OR-OR/AND-OR/AND, OR cases ###
 
-# case 1 -- we'll see
-# ex1 = np.array([1,2,5])
-# ex2 = np.array([3,4,6])
+# case 1 -- works!!
+ex1 = np.array([1,2,5])
+ex2 = np.array([3,4,6])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
