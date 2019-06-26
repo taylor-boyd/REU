@@ -28,9 +28,9 @@ def findOrNodes(ex1, ex2):
 
     return orNodes
 
-def replaceOrNodes(ex, orNodes):
+def replaceOrNodes(ex, orNodes, ex1):
     for i in range(0,orNodes.size-1):
-        if (orNodes[i+1] - orNodes[i]) == 1:
+        if (orNodes[i+1] - orNodes[i]) == 1 and len(ex1) == len(ex): # precaution for OR cases
             ex = np.where(ex==orNodes[i+1], int(orNodes[i]), ex)
     return ex
 
@@ -148,8 +148,9 @@ def andBuilding(ex1, ex2):
 def orBuilding(ex1, ex2, orNodes):
     global andDict
     global orDict
-
+    
     delKey = delKey2 = 10
+    keys = [0] * 4
     if len(ex1) != len(ex2):
         orDict.clear()
         for i in range(0, orNodes.size-1):
@@ -161,7 +162,8 @@ def orBuilding(ex1, ex2, orNodes):
                 orDict[orNodes[i]] = newNode
                 delKey = i
         if delKey != 10:
-            key = orNodes[delKey]
+            keys[0] = orNodes[delKey]
+            keys[1] = orNodes[delKey+1]
             orNodes = np.delete(orNodes, delKey+1)
             orNodes = np.delete(orNodes, delKey)
         for i in range(0, orNodes.size-1):
@@ -172,24 +174,20 @@ def orBuilding(ex1, ex2, orNodes):
                 orDict[orNodes[i]] = node
                 delKey2 = i
         if delKey2 != 10:
+            keys[2] = orNodes[delKey2]
+            keys[3] = orNodes[delKey2+1]
             orNodes = np.delete(orNodes, delKey2+1)
             orNodes = np.delete(orNodes, delKey2)
-        print(orNodes)
         for i in orNodes:
-            values = orDict.values()
-            first = values[0].name
-            second = values[1].name
-            if not np.isin(i-1, orDict) and (i-1) != first and (i-1) != second:
+            if not np.isin(i-1, orDict) and not np.isin(i-1, keys):
                 print(orDict.values())
-                node = Node("OR", parent=orDict[key])
+                node = Node("OR", parent=orDict[keys[0]])
                 left = Node(i-1, parent=node)
                 right = Node(i, parent=node)
-                orDict[i-1] = node
             else:
-                node = Node("OR", parent=orDict[key])
+                node = Node("OR", parent=orDict[keys[0]])
                 left = Node(i, parent=node)
                 right = Node(i+1, parent=node)
-                orDict[i] = node
 
     else:
         for key in orDict:
@@ -261,7 +259,7 @@ def reconstruct(andNodes, orNodes, ex1):
         
 def mainAlg(ex1, ex2):
     orNodes = findOrNodes(ex1, ex2)
-    ex2 = replaceOrNodes(ex2, orNodes)
+    ex2 = replaceOrNodes(ex2, orNodes, ex1)
     graph = initGraph(ex1, ex2)
     andNodes = findAndNodes(graph)
     ex1, ex2 = andBuilding(ex1, ex2)
