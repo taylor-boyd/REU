@@ -413,8 +413,8 @@ def mainAlg(ex1, ex2):
 # ex2 = np.array([2,4,1,8,6])
 
 # case 3 -- works!!
-ex1 = np.array([1,5,6])
-ex2 = np.array([4,8,7])
+# ex1 = np.array([1,5,6])
+# ex2 = np.array([4,8,7])
 
 # case 4 -- works!!
 # ex1 = np.array([1,5,7,8])
@@ -440,13 +440,29 @@ ex2 = np.array([4,8,7])
 
 ### THEN and OR ###
 
-# case 1
+# case 1 -- works!!
 # ex1 = np.array([1,2,3])
 # ex2 = np.array([1,2,4])
 
-# case 2
+# case 2 -- works!!
 # ex1 = np.array([1,3,4])
 # ex2 = np.array([2,3,4])
+
+### THEN branch ###
+
+# case 1 -- works!!
+# ex1 = np.array([1,2,3,4,5,6])
+# ex2 = np.array([4,3,2,1,5,6])
+
+# case 2 -- works!!
+# ex1 = np.array([1,2,3])
+# ex2 = np.array([1,2,6])
+
+### THEN at depth 3 ###
+
+# case 1
+ex1 = np.array([1,2,3,5])
+ex2 = np.array([4,1,2,6])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
