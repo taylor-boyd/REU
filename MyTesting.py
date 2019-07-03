@@ -5,6 +5,7 @@ from anytree import Node, RenderTree
 
 andDict = dict()
 orDict = dict()
+thenDict = dict()
 
 ############ HELPER FUNCTIONS ############
 
@@ -71,7 +72,7 @@ def findAndNodes(graph):
                     if i not in andDict:
                         andDict[i] = node
     # checks for special case (AND-AND/AND-AND/AND, OR case 4)
-    if not any(andDict):
+    if not any(andDict) and len(ex1) > 3:
         for key in graph:
             keyVals = np.empty((0,3), int)
             for i in graph[key]:
@@ -92,6 +93,31 @@ def findAndNodes(graph):
                             andDict[i] = node
             
     return andNodes
+
+def findThenNodes(graph, andNodes, orNodes):
+    global thenDict
+   
+    thenNodes = np.empty((0,2), int)
+    for key in graph:
+        keyVals = np.empty((0,3), int)
+        for i in graph[key]:
+            if i > 0 and key > 0:
+                if not np.isin(i, keyVals):
+                    keyVals = np.append(keyVals, i)
+                elif not np.isin(i, andNodes) and not np.isin(key, andNodes):
+                    if not np.isin(i, orNodes) and not np.isin(key, orNodes):
+                        node = Node("THEN")
+                        if i < key:
+                            thenNodes = np.concatenate((thenNodes, [[i, key]]), axis=0)
+                            left = Node(i, parent=node)
+                            right = Node(key, parent=node)
+                        else:
+                            thenNodes = np.concatenate((thenNodes, [[key, i]]), axis=0)
+                            left = Node(key, parent=node)
+                            right = Node(i, parent=node)
+                        if i not in thenDict:
+                            thenDict[i] = node
+    return thenNodes
 
 def andBuilding(ex1, ex2):
     global andDict
@@ -254,6 +280,7 @@ def orBuilding(ex1, ex2, orNodes, andNodes):
 def reconstruct(andNodes, orNodes, ex1):
     global andDict
     global orDict
+    global thenDict
     
     tree = Node("THEN")
 
@@ -332,6 +359,26 @@ def reconstruct(andNodes, orNodes, ex1):
         del orDict[dk]
     if dk2 != 10 and dk2 in orDict:
         del orDict[dk2]
+    delKey1 = delKey2 = 10
+    for key in thenDict:
+        if any(orDict):
+            for key2 in orDict:
+                if key > key2:
+                    node = orDict[key2]
+                    node.parent = tree
+                    delKey1 = key2
+        if any(andDict):
+            for key3 in andDict:
+                if key > key3:
+                    node = andDict[key3]
+                    node.parent = tree
+                    delKey2 = key3
+        node = thenDict[key]
+        node.parent = tree
+    if delKey1 != 10:
+        del orDict[delKey1]
+    if delKey2 != 10:
+        del andDict[delKey2]
     for key in orDict:
         node = orDict[key]
         node.parent = tree
@@ -346,6 +393,7 @@ def mainAlg(ex1, ex2):
     ex2 = replaceOrNodes(ex2, orNodes, ex1)
     graph = initGraph(ex1, ex2)
     andNodes = findAndNodes(graph)
+    thenNodes = findThenNodes(graph, andNodes, orNodes)
     ex1, ex2 = andBuilding(ex1, ex2)
     ex2 = swapBack(ex2, orNodes, ex1)
     orNodes = orBuilding(ex1, ex2, orNodes, andNodes)
@@ -353,62 +401,6 @@ def mainAlg(ex1, ex2):
 
 
 #%%
-
-### AND-AND/AND-AND/OR, OR cases ###
-
-# case 1 -- works!!
-# ex1 = np.array([1,2,3,5])
-# ex2 = np.array([4,2,1,6])
-
-# case 2 -- works!!
-# ex1 = np.array([1,3,2,5])
-# ex2 = np.array([2,4,1,6])
-
-# case 3 -- works!!
-# ex1 = np.array([1,3,4,5])
-# ex2 = np.array([2,6,4,3])
-
-# case 4 -- works!!
-# ex1 = np.array([1,3,5,4])
-# ex2 = np.array([2,4,6,3])
-
-### AND-AND/AND-AND/AND, OR cases ###
-
-# case 1 -- works!!
-# ex1 = np.array([1,2,3,4,5])
-# ex2 = np.array([4,3,2,1,6])
-
-# case 2 -- works!!
-# ex1 = np.array([1,3,2,4,5])
-# ex2 = np.array([4,2,3,1,6])
-
-# case 3 -- works!!
-# ex1 = np.array([1,3,4,5,6])
-# ex2 = np.array([2,6,5,4,3])
-
-# case 4 -- works!!
-# ex1 = np.array([1,3,5,4,6])
-# ex2 = np.array([2,4,6,3,5])
-
-### AND-AND/AND-AND/AND, AND cases ###
-
-# case 1 -- works!!
-# ex1 = np.array([1,2,3,4,5,6])
-# ex2 = np.array([4,3,2,1,6,5])
-
-# case 2 -- works!!
-# ex1 = np.array([1,2,3,4,5,6])
-# ex2 = np.array([2,1,6,5,4,3])
-
-### AND-AND/OR-AND/OR cases ###
-
-# case 1 -- works!!
-# ex1 = np.array([1,3,5,6])
-# ex2 = np.array([4,2,6,5])
-
-# case 2 -- works!!
-# ex1 = np.array([1,3,5])
-# ex2 = np.array([2,6,4])
 
 ### Depth of 3 on both sides ###
 
@@ -421,8 +413,8 @@ def mainAlg(ex1, ex2):
 # ex2 = np.array([2,4,1,8,6])
 
 # case 3 -- works!!
-# ex1 = np.array([1,5,6])
-# ex2 = np.array([4,8,7])
+ex1 = np.array([1,5,6])
+ex2 = np.array([4,8,7])
 
 # case 4 -- works!!
 # ex1 = np.array([1,5,7,8])
@@ -435,6 +427,26 @@ def mainAlg(ex1, ex2):
 # case 6 -- works!!
 # ex1 = np.array([1,2,3,4,5,6,7,8])
 # ex2 = np.array([4,3,2,1,8,7,6,5])
+
+### THEN and AND ###
+
+# case 1 -- works!!
+# ex1 = np.array([1,2,3,4])
+# ex2 = np.array([1,2,4,3])
+
+# case 2 -- works!!
+# ex1 = np.array([1,2,3,4])
+# ex2 = np.array([2,1,3,4])
+
+### THEN and OR ###
+
+# case 1
+# ex1 = np.array([1,2,3])
+# ex2 = np.array([1,2,4])
+
+# case 2
+# ex1 = np.array([1,3,4])
+# ex2 = np.array([2,3,4])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
