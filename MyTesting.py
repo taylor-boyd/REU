@@ -455,14 +455,14 @@ def mainAlg(ex1, ex2):
 # ex2 = np.array([4,3,2,1,5,6])
 
 # case 2 -- works!!
-# ex1 = np.array([1,2,3])
-# ex2 = np.array([1,2,6])
+ex1 = np.array([1,2,3])
+ex2 = np.array([1,2,6])
 
 ### THEN at depth 3 ###
 
-# case 1
-ex1 = np.array([1,2,3,5])
-ex2 = np.array([4,1,2,6])
+# case 1 -- treats THEN as AND
+# ex1 = np.array([1,2,3,5])
+# ex2 = np.array([4,1,2,6])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
