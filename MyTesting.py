@@ -29,6 +29,7 @@ def findOrNodes(ex1, ex2):
 
     return orNodes
 
+# replaces OR node value from ex2 with pairs (from ex1)
 def replaceOrNodes(ex, orNodes, ex1):
     if not len(ex1) <= 2 and not len(ex2) <= 2:
         for i in range(0,orNodes.size-1):
@@ -72,25 +73,25 @@ def findAndNodes(graph):
                     if i not in andDict:
                         andDict[i] = node
     # checks for special case (AND-AND/AND-AND/AND, OR case 4)
-    if not any(andDict) and len(ex1) > 3:
-        for key in graph:
-            keyVals = np.empty((0,3), int)
-            for i in graph[key]:
-                if i > 0 and key > 0:
-                    if not np.isin(i, keyVals):
-                        keyVals = np.append(keyVals, i)
-                    else:
-                        node = Node("AND")
-                        if i < key:
-                            andNodes = np.concatenate((andNodes, [[i, key]]), axis=0)
-                            left = Node(i, parent=node)
-                            right = Node(key, parent=node)
-                        else:
-                            andNodes = np.concatenate((andNodes, [[key, i]]), axis=0)
-                            left = Node(key, parent=node)
-                            right = Node(i, parent=node)
-                        if i not in andDict:
-                            andDict[i] = node
+    #if not any(andDict) and len(ex1) > 3:
+    #    for key in graph:
+    #        keyVals = np.empty((0,3), int)
+    #        for i in graph[key]:
+    #            if i > 0 and key > 0:
+    #                if not np.isin(i, keyVals):
+    #                    keyVals = np.append(keyVals, i)
+    #                else:
+    #                    node = Node("AND")
+    #                    if i < key:
+    #                        andNodes = np.concatenate((andNodes, [[i, key]]), axis=0)
+    #                        left = Node(i, parent=node)
+    #                        right = Node(key, parent=node)
+    #                    else:
+    #                        andNodes = np.concatenate((andNodes, [[key, i]]), axis=0)
+    #                        left = Node(key, parent=node)
+    #                        right = Node(i, parent=node)
+    #                    if i not in andDict:
+    #                        andDict[i] = node
             
     return andNodes
 
@@ -122,6 +123,7 @@ def findThenNodes(graph, andNodes, orNodes):
 def andBuilding(ex1, ex2):
     global andDict
     global orDict
+    print(andDict)
  
     delKey1 = delKey2 = 10
     for key in andDict:
@@ -175,6 +177,8 @@ def andBuilding(ex1, ex2):
         del orDict[delKey2]
     if len(andDict.keys()) > 2:
         ex1, ex2 = andBuilding(ex1, ex2)
+    print(andDict)
+    print(andNodes)
 
     return ex1, ex2
 
@@ -455,14 +459,18 @@ def mainAlg(ex1, ex2):
 # ex2 = np.array([4,3,2,1,5,6])
 
 # case 2 -- works!!
-ex1 = np.array([1,2,3])
-ex2 = np.array([1,2,6])
+# ex1 = np.array([1,2,3])
+# ex2 = np.array([1,2,6])
 
 ### THEN at depth 3 ###
 
 # case 1 -- treats THEN as AND
 # ex1 = np.array([1,2,3,5])
 # ex2 = np.array([4,1,2,6])
+
+# AND-AND/AND-AND/AND, OR
+ex1 = np.array([1,3,6,4,5])
+ex2 = np.array([2,3,5,4,6])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
