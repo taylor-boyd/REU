@@ -72,32 +72,12 @@ def findAndNodes(graph):
                         right = Node(i, parent=node)        
                     if i not in andDict:
                         andDict[i] = node
-    # checks for special case (AND-AND/AND-AND/AND, OR case 4)
-    #if not any(andDict) and len(ex1) > 3:
-    #    for key in graph:
-    #        keyVals = np.empty((0,3), int)
-    #        for i in graph[key]:
-    #            if i > 0 and key > 0:
-    #                if not np.isin(i, keyVals):
-    #                    keyVals = np.append(keyVals, i)
-    #                else:
-    #                    node = Node("AND")
-    #                    if i < key:
-    #                        andNodes = np.concatenate((andNodes, [[i, key]]), axis=0)
-    #                        left = Node(i, parent=node)
-    #                        right = Node(key, parent=node)
-    #                    else:
-    #                        andNodes = np.concatenate((andNodes, [[key, i]]), axis=0)
-    #                        left = Node(key, parent=node)
-    #                        right = Node(i, parent=node)
-    #                    if i not in andDict:
-    #                        andDict[i] = node
             
     return andNodes
 
+# looks for THEN nodes (there will be 2 of the same vals for a key)
 def findThenNodes(graph, andNodes, orNodes):
     global thenDict
-   
     thenNodes = np.empty((0,2), int)
     for key in graph:
         keyVals = np.empty((0,3), int)
@@ -120,18 +100,18 @@ def findThenNodes(graph, andNodes, orNodes):
                             thenDict[i] = node
     return thenNodes
 
+# looks for larger AND relationships
 def andBuilding(ex1, ex2):
     global andDict
     global orDict
-    print(andDict)
  
     delKey1 = delKey2 = 10
     for key in andDict:
         index1 = index2 = index3 = index4 = 0
         for i in andDict[key].children: 
             for j in range(0,ex1.size):
-                if j < len(ex1) and j < len(ex2): #added this in case of diff length examples
-                    if ex1[j] == i.name:
+                if j < len(ex1) and j < len(ex2): # added this in case of diff length examples
+                    if ex1[j] == i.name:          # don't want to go out of bounds
                         index1 += j
                     if ex2[j] == i.name:
                         index2 += j
@@ -177,8 +157,6 @@ def andBuilding(ex1, ex2):
         del orDict[delKey2]
     if len(andDict.keys()) > 2:
         ex1, ex2 = andBuilding(ex1, ex2)
-    print(andDict)
-    print(andNodes)
 
     return ex1, ex2
 
@@ -409,8 +387,8 @@ def mainAlg(ex1, ex2):
 ### Depth of 3 on both sides ###
 
 # case 1 -- works!!
-# ex1 = np.array([1,2,3,4,5])
-# ex2 = np.array([4,3,2,1,7])
+ex1 = np.array([1,2,3,4,5])
+ex2 = np.array([4,3,2,1,7])
 
 # case 2 -- works!!
 # ex1 = np.array([1,3,2,5,7])
@@ -469,8 +447,8 @@ def mainAlg(ex1, ex2):
 # ex2 = np.array([4,1,2,6])
 
 # AND-AND/AND-AND/AND, OR
-ex1 = np.array([1,3,6,4,5])
-ex2 = np.array([2,3,5,4,6])
+# ex1 = np.array([1,3,6,4,5])
+# ex2 = np.array([2,3,5,4,6])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
