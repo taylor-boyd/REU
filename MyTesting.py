@@ -72,7 +72,7 @@ def findAndNodes(graph):
                         right = Node(i, parent=node)        
                     if i not in andDict:
                         andDict[i] = node
-            
+    print(andNodes)
     return andNodes
 
 # looks for THEN nodes (there will be 2 of the same vals for a key)
@@ -100,11 +100,19 @@ def findThenNodes(graph, andNodes, orNodes):
                             thenDict[i] = node
     return thenNodes
 
+#def building(ex1, ex2):
+#    if ex1.size == ex2.size:
+#        for i in range(0,ex1.size):
+#            if ex1[i] == ex2[i]:          # don't want to go out of bounds
+                #check if or or and
+#    else:
+        #OR-OR
+
 # looks for larger AND relationships
 def andBuilding(ex1, ex2):
     global andDict
     global orDict
- 
+    
     delKey1 = delKey2 = 10
     for key in andDict:
         index1 = index2 = index3 = index4 = 0
