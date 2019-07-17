@@ -141,9 +141,11 @@ def andBuilding(ex1, ex2, andNodes, orNodes):
 
     return ex1, ex2
 
+# OR values are replaced back to original so that indices can be used to
+# determine hierarchical OR relationships in next method
 def swapBack(ex, orNodes, ex1):
-    if not len(ex1) <= 2 and not len(ex2) <= 2:
-        for i in range(0,orNodes.size-1):
+    if not len(ex1) <= 2 and not len(ex2) <= 2: # if length is less than 2, depth is less than 3
+        for i in range(0,orNodes.size-1):       # so swapping doesn't matter (there's no higher OR relationships to be found)
             if np.isin(orNodes[i], ex) and np.isin(orNodes[i], ex1):
                 if np.isin(orNodes[i+1], ex):
                     if np.isin(orNodes[i+1]+1, orNodes):
