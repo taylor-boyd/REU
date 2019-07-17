@@ -72,7 +72,6 @@ def findAndNodes(graph):
                         right = Node(i, parent=node)        
                     if i not in andDict:
                         andDict[i] = node
-    print(andNodes)
     return andNodes
 
 # looks for THEN nodes (there will be 2 of the same vals for a key)
@@ -100,71 +99,45 @@ def findThenNodes(graph, andNodes, orNodes):
                             thenDict[i] = node
     return thenNodes
 
-#def building(ex1, ex2):
-#    if ex1.size == ex2.size:
-#        for i in range(0,ex1.size):
-#            if ex1[i] == ex2[i]:          # don't want to go out of bounds
-                #check if or or and
-#    else:
-        #OR-OR
-
 # looks for larger AND relationships
-def andBuilding(ex1, ex2):
+def andBuilding(ex1, ex2, andNodes, orNodes):
     global andDict
     global orDict
-    
-    delKey1 = delKey2 = 10
-    for key in andDict:
-        index1 = index2 = index3 = index4 = 0
-        for i in andDict[key].children: 
-            for j in range(0,ex1.size):
-                if j < len(ex1) and j < len(ex2): # added this in case of diff length examples
-                    if ex1[j] == i.name:          # don't want to go out of bounds
-                        index1 += j
-                    if ex2[j] == i.name:
-                        index2 += j
-        if index1 != index2:
-            newNode = Node("AND")
-            newLeft = andDict[key]
-            newLeft.parent = newNode
-            if (index1 - index2) == 2 or (index2 - index1) == 2:
-                for key2 in orDict:
-                    for i2 in range(0,ex1.size):
-                        if ex1[i2] == key2:
-                            index3 += i2
-                        if ex2[i2] == key2:
-                            index4 += i2
-                    if index3 != index4:
-                        if (index3 - index4) == 2 or (index4 - index3) == 2:
-                            newRight = orDict[key2]
-                            newRight.parent = newNode
-                            delKey2 = key2        
-                            break
-            else:
-                if (index1 - index2) == 4 or (index2 - index1) == 4:
-                    nextKey = key+2
-                    nextKey2 = key+1
-                    lastKey = key-2
-                    if nextKey in andDict:
-                        newRight = andDict[nextKey]
-                        newRight.parent = newNode
-                        delKey1 = nextKey
-                    elif nextKey2 in andDict:
-                        newRight = andDict[nextKey2]
-                        newRight.parent = newNode
-                        delKey1 = nextKey2
-                    elif lastKey in andDict:
-                        newRight = andDict[lastKey]
-                        newRight.parent = newNode
-                        delKey1 = lastKey
-            andDict[key] = newNode
-            break
-    if delKey1 != 10:
-        del andDict[delKey1]
-    elif delKey2 != 10:
-        del orDict[delKey2]
-    if len(andDict.keys()) > 2:
-        ex1, ex2 = andBuilding(ex1, ex2)
+    # if samples are diff lengths, we'll choose smaller one to stay in bounds
+    if ex1.size <= ex2.size: 
+        ex = ex1
+    else: 
+        ex = ex2
+    for i in range(0,ex.size-1):
+        if ex1[i] != ex2[i]:
+            if ex[i] in andDict:
+                for j in range(0, len(andNodes)):
+                    for k in andNodes[j]:
+                        for child in andDict[ex[i]].children:
+                            if k == child.name and k != ex[i]:
+                                val = k
+                                index1 = np.argwhere(ex1==val)
+                                index2 = np.argwhere(ex2==val)
+                                newNode = Node("AND")
+                                newLeft = andDict[ex[i]]
+                                newLeft.parent = newNode
+                                if index1 != index2:               # both indices do not match so AND is
+                                    if j+1 < len(andNodes):        # parent of AND and AND node
+                                        key = andNodes[j+1][1]     
+                                    else:
+                                        key = andNodes[j-1][1]
+                                    newRight = andDict[key]
+                                    newRight.parent = newNode
+                                    del andDict[key]
+                                    andDict[ex[i]] = newNode
+                                else:                               # one index does not match so AND is
+                                    for i2 in range(0,ex1.size):    # parent of AND and OR node
+                                        if ex1[i2] != ex2[i2]:
+                                            if ex[i2] in orDict:
+                                                newRight = orDict[ex[i2]]
+                                                newRight.parent = newNode
+                                                del orDict[ex[i2]]
+                                break
 
     return ex1, ex2
 
@@ -384,7 +357,7 @@ def mainAlg(ex1, ex2):
     graph = initGraph(ex1, ex2)
     andNodes = findAndNodes(graph)
     thenNodes = findThenNodes(graph, andNodes, orNodes)
-    ex1, ex2 = andBuilding(ex1, ex2)
+    ex1, ex2 = andBuilding(ex1, ex2, andNodes, orNodes)
     ex2 = swapBack(ex2, orNodes, ex1)
     orNodes = orBuilding(ex1, ex2, orNodes, andNodes)
     return ex1, ex2, andNodes, orNodes
@@ -395,8 +368,8 @@ def mainAlg(ex1, ex2):
 ### Depth of 3 on both sides ###
 
 # case 1 -- works!!
-ex1 = np.array([1,2,3,4,5])
-ex2 = np.array([4,3,2,1,7])
+# ex1 = np.array([1,2,3,4,5])
+# ex2 = np.array([4,3,2,1,7])
 
 # case 2 -- works!!
 # ex1 = np.array([1,3,2,5,7])
@@ -415,8 +388,8 @@ ex2 = np.array([4,3,2,1,7])
 # ex2 = np.array([4,8])
 
 # case 6 -- works!!
-# ex1 = np.array([1,2,3,4,5,6,7,8])
-# ex2 = np.array([4,3,2,1,8,7,6,5])
+ex1 = np.array([1,2,3,4,5,6,7,8])
+ex2 = np.array([4,3,2,1,8,7,6,5])
 
 ### THEN and AND ###
 
