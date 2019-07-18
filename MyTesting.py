@@ -114,15 +114,15 @@ def andBuilding(ex1, ex2, andNodes, orNodes):
                 for j in range(0, len(andNodes)):
                     for k in andNodes[j]:
                         for child in andDict[ex[i]].children:
-                            if k == child.name and k != ex[i]:
+                            if k == child.name and k != ex[i] and (k - ex[i] == 1 or ex[i] - k == 1):
                                 val = k
                                 index1 = np.argwhere(ex1==val)
                                 index2 = np.argwhere(ex2==val)
                                 newNode = Node("AND")
                                 newLeft = andDict[ex[i]]
                                 newLeft.parent = newNode
-                                if index1 != index2:               # both indices do not match so AND is
-                                    if j+1 < len(andNodes):        # parent of AND and AND node
+                                if index1 != index2:             # both indices do not match so AND is
+                                    if j+1 < len(andNodes):      # parent of AND and AND node
                                         key = andNodes[j+1][1]     
                                     else:
                                         key = andNodes[j-1][1]
@@ -153,15 +153,16 @@ def swapBack(ex, orNodes, ex1):
                 ex = np.where(ex==orNodes[i], int(orNodes[i+1]), ex)
     return ex
 
+# looks for larger OR relationships
 def orBuilding(ex1, ex2, orNodes, andNodes):
     global andDict
     global orDict
     
-    delKey = delKey2 = 10
     keys = [0] * 4
+    # different lengths indicates OR-OR/OR-OR/AND relationship
     if len(ex1) != len(ex2):
         orDict.clear()
-        for i in range(0, orNodes.size-1):
+        for i in range(0, orNodes.size-1):         # if OR node pair is in one ex only, it's the AND node child
             if ((np.isin(orNodes[i], ex1) and np.isin(orNodes[i+1], ex1)) or 
                         (np.isin(orNodes[i], ex2) and np.isin(orNodes[i+1], ex2))):
                 newNode = Node("OR")
@@ -169,45 +170,29 @@ def orBuilding(ex1, ex2, orNodes, andNodes):
                 left = Node(orNodes[i+1], parent=node)
                 right = Node(orNodes[i], parent=node)
                 orDict[orNodes[i]] = newNode
-                delKey = i
-        if delKey != 10:
-            keys[0] = orNodes[delKey]
-            keys[1] = orNodes[delKey+1]
-            orNodes = np.delete(orNodes, delKey+1)
-            orNodes = np.delete(orNodes, delKey)
-            dKey = 10
-            for key in andDict:
-                for value in andDict[key].children:
-                    if keys[0] == value.name or keys[1] == value.name:
-                        dKey = key
-            if dKey != 10:
-                del andDict[dKey]
-        for i in range(0, orNodes.size-1):
-            if orNodes[i+1] - orNodes[i] == 1:
+                keys[0] = orNodes[i]
+                keys[1] = orNodes[i+1]
+        for i in range(0, orNodes.size-1):          # this is for OR nodes outside of branch being built
+            if orNodes[i+1] - orNodes[i] == 1 and not np.isin(orNodes[i], keys):
                 node = Node("OR")
                 left = Node(orNodes[i], parent=node)
                 right = Node(orNodes[i+1], parent=node)
                 orDict[orNodes[i]] = node
-                delKey2 = i
-        if delKey2 != 10:
-            keys[2] = orNodes[delKey2]
-            keys[3] = orNodes[delKey2+1]
-            orNodes = np.delete(orNodes, delKey2+1)
-            orNodes = np.delete(orNodes, delKey2)
-        for i in orNodes:
-            if not i-1 in orDict:
+                keys[2] = orNodes[i]
+                keys[3] = orNodes[i+1]
+        for i in orNodes:                          
+            if not i in orDict and not np.isin(i, keys):
+                node = Node("OR", parent=orDict[keys[0]])
                 if not np.isin(i-1, keys) and not np.isin(i-1, andNodes) and i-1 > 0:
-                    node = Node("OR", parent=orDict[keys[0]])
                     left = Node(i-1, parent=node)
                     right = Node(i, parent=node)
                 else:
-                    node = Node("OR", parent=orDict[keys[0]])
                     left = Node(i, parent=node)
                     right = Node(i+1, parent=node)
-    else:
-        for key in orDict:
+    else:                               # looks for OR-OR/OR-OR/OR relationship or
+        for key in orDict:              # OR-OR/AND-OR/AND relationship
             orPairs = orDict[key].children
-            if orPairs[1].name - orPairs[0].name != 1:
+            if orPairs[1].name - orPairs[0].name != 1:  # OR-OR/OR-OR/OR
                 newNode = Node("OR")
                 node1 = Node("OR", parent=newNode)
                 left = Node(orPairs[0].name, parent=node1)
@@ -219,29 +204,25 @@ def orBuilding(ex1, ex2, orNodes, andNodes):
                 else:
                     right2 = Node((orPairs[1].name)+1, parent=node2)
                 orDict[orPairs[0].name] = newNode
-        if len(orDict.keys()) == 3 or len(andDict.keys()) == 1:
+        if len(orDict.keys()) == 3 or len(andDict.keys()) == 1:     # OR-OR/AND-OR/AND
             newNode = Node("OR")
             for i in range(0, orNodes.size-1):
                 if np.isin(orNodes[i], ex1) and np.isin(orNodes[i+1], ex1):
                     node = Node("AND", parent=newNode)
                     left = Node(orNodes[i], parent=node)
                     right = Node(orNodes[i+1], parent=node)
-                    delKey = i
-                    i += 1
+                    orDict[orNodes[i]] = newNode
                 elif np.isin(orNodes[i], ex2) and np.isin(orNodes[i+1], ex2):
                     node = Node("AND", parent=newNode)
                     left = Node(orNodes[i], parent=node)
                     right = Node(orNodes[i+1], parent=node)
-                    delKey2 = i
-            if delKey != 10:
-                orDict[orNodes[delKey]] = newNode
-            if delKey2 != 10:
-                if orNodes[delKey2] in orDict:
-                    del orDict[orNodes[delKey2]]
-                else:
-                    del orDict[orNodes[delKey2+1]]
+                    if orNodes[i] in orDict:
+                        del orDict[orNodes[i]]
+                    else:
+                        del orDict[orNodes[i+1]]
     return orNodes
 
+# constructs final task tree and looks for any missed relationships
 def reconstruct(andNodes, orNodes, ex1):
     global andDict
     global orDict
@@ -382,16 +363,16 @@ def mainAlg(ex1, ex2):
 # ex2 = np.array([4,8,7])
 
 # case 4 -- works!!
-# ex1 = np.array([1,5,7,8])
-# ex2 = np.array([4,3,8,7,6])
+ex1 = np.array([1,5,7,8])
+ex2 = np.array([4,3,8,7,6])
 
 # case 5 -- works!!
 # ex1 = np.array([1,5])
 # ex2 = np.array([4,8])
 
 # case 6 -- works!!
-ex1 = np.array([1,2,3,4,5,6,7,8])
-ex2 = np.array([4,3,2,1,8,7,6,5])
+# ex1 = np.array([1,2,3,4,5,6,7,8])
+# ex2 = np.array([4,3,2,1,8,7,6,5])
 
 ### THEN and AND ###
 
@@ -432,6 +413,16 @@ ex2 = np.array([4,3,2,1,8,7,6,5])
 # AND-AND/AND-AND/AND, OR
 # ex1 = np.array([1,3,6,4,5])
 # ex2 = np.array([2,3,5,4,6])
+
+### OR-OR/OR-OR/AND cases ###
+
+# case 1 -- works!!
+# ex1 = np.array([1,2,5])
+# ex2 = np.array([3,6])
+
+# case 2 -- works!!
+# ex1 = np.array([1,2,5,6])
+# ex2 = np.array([2,1,3])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
