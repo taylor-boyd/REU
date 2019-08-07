@@ -333,8 +333,8 @@ def mainAlg(ex1, ex2):
 ### Depth of 3 on both sides ###
 
 # case 1 -- works!!
-ex1 = np.array([1,2,3,4,5])
-ex2 = np.array([4,3,2,1,7])
+# ex1 = np.array([1,2,3,4,5])
+# ex2 = np.array([4,3,2,1,7])
 
 # case 2 -- works!!
 # ex1 = np.array([1,3,2,5,7])
@@ -395,24 +395,6 @@ ex2 = np.array([4,3,2,1,7])
 # AND-AND/AND-AND/AND, OR
 # ex1 = np.array([1,3,6,4,5])
 # ex2 = np.array([2,3,5,4,6])
-
-### reconstruct testing ###
-
-# case 1 -- works!!
-# ex1 = np.array([1,3,2,5])
-# ex2 = np.array([2,4,1,6])
-
-# case 2 -- works!!
-# ex1 = np.array([1,3,5,4])
-# ex2 = np.array([2,4,6,3])
-
-# case 1 -- works!!
-# ex1 = np.array([1,3,5,6])
-# ex2 = np.array([4,2,6,5])
-
-# case 2 -- works!!
-# ex1 = np.array([1,3,5])
-# ex2 = np.array([2,6,4])
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
