@@ -1,3 +1,7 @@
-# 2019 REU Project
+# Hierarchical Task Learning Through Human Demonstration
 
-#### Hierarchical Task learning through human demonstration.
+#### Dependencies:
+#### - numpy
+#### - anytree
+
+#### - Main_Documented
