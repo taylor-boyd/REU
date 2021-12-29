@@ -1,7 +1,8 @@
 # Hierarchical Task Learning Through Human Demonstration
 
 ### Dependencies:
-#### numpy
+#### &nbsp; NumPy
+##### download with "pip install numpy"
 #### anytree
 ##### download with "pip install anytree"
 
