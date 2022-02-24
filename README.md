@@ -12,6 +12,7 @@
 &nbsp; AnyTree  
 &nbsp;&nbsp; download with "pip install anytree"
 <br />
+<br />
 &nbsp; Distributed_Collaborative_Task_Tree
 <br />
 &nbsp;&nbsp; code and instructions at https://github.com/UNR-RoboticsResearchLab/Distributed_Collaborative_Task_Tree
@@ -20,8 +21,10 @@
 
 ### How to run:
 &nbsp; MainAlg-Copy1.py
+<br />
 &nbsp; This file is just an un-documented copy of Main_Documented.py.
 <br />
+
 &nbsp; Main_Documented.py
 <br />
 &nbsp; This is the main program that takes in 2 well-representative task sequences and outputs a corresponding hierarchical task tree. The trees that can be correctly reconstructed must have a root 'THEN' node and a maximum depth of 3; all nodes other than the root can be either 'AND' or 'OR'.
