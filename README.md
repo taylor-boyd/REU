@@ -1,11 +1,11 @@
 # Hierarchical Task Learning Through Human Demonstration
 
-### Project Abstract:
+## Project Abstract:
 &nbsp; In order for robots to carry out a task sequence, it must be translated in such a way that they can understand. One way this can be done is by using a task tree representation. Currently this method does not allow robots and humans to collaborate without interruption as hard coding of the task tree is required. One solution to this is to enable robots to construct task trees themselves. After observing a human demonstrate a repeated series of tasks, the robot would then use the different sequences to build and store a corresponding hierarchical task tree representation. The accuracy of the constructed task tree can be validated through the comparison of the robot's completion of the task and the human's original demonstration as well as the robot's ability to complete the task in more ways than one. Upon validation, this process will allow human-robot interactions to remain continuous and enable those without a computer science background to collaborate with robots as well. 
 <br />
 &nbsp; Link to research paper (incomplete): https://www.overleaf.com/read/mvzxrhhtknjq
 
-### Dependencies:
+## Dependencies:
 
 #### NumPy  
 &nbsp; download with "pip install numpy"  
@@ -18,7 +18,7 @@
 <br />
 &nbsp; my code is in the 'taylor_while' branch; this where 'sequence_builder.cc' can be found
 
-### How to run:
+## How to run:
 
 #### MainAlg-Copy1.py
 &nbsp; This file is just an un-documented copy of Main_Documented.py.
