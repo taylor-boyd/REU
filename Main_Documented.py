@@ -152,6 +152,8 @@ def mainAlg(ex1, ex2):
 # case 4.2 -- works!!
 # ex1 = np.array([1,2,3,4,5,6])
 # ex2 = np.array([2,1,6,5,4,3])
+
+# I commented out the code below so that I could test 'Main_testscript.py'
 """
 
 print("ex1: " + str(ex1))
