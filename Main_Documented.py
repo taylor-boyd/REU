@@ -3,6 +3,7 @@
 import numpy as np
 from anytree import Node, RenderTree
 
+global andDict
 andDict = dict()
 orDict = dict()
 
@@ -141,8 +142,8 @@ def mainAlg(ex1, ex2):
 # ex2 = np.array([4,3,2,1,6])
 
 # case 3.2 -- works!!
-ex1 = np.array([1,3,4,5,6])
-ex2 = np.array([2,6,5,4,3])
+#ex1 = np.array([1,3,4,5,6])
+#ex2 = np.array([2,6,5,4,3])
 
 # case 4 -- works!!
 # ex1 = np.array([1,2,3,4,5,6])
@@ -151,7 +152,7 @@ ex2 = np.array([2,6,5,4,3])
 # case 4.2 -- works!!
 # ex1 = np.array([1,2,3,4,5,6])
 # ex2 = np.array([2,1,6,5,4,3])
-
+"""
 
 print("ex1: " + str(ex1))
 print("ex2: " + str(ex2))
@@ -165,7 +166,7 @@ andNodes = andNodes.flatten()               # 'flattens' array, collapses it int
 tree = reconstruct(andNodes, orNodes, ex1)
 print("\n\nRECONSTRUCTED TREE: \n")
 print(RenderTree(tree))                     # anytree feature (Node is too)
-
+"""
 #%%
 
 
