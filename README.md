@@ -6,7 +6,7 @@
 &nbsp; Link to research paper (incomplete): https://www.overleaf.com/read/mvzxrhhtknjq
 
 ### Dependencies:
-&nbsp; NumPy  
+#### NumPy  
 &nbsp;&nbsp; download with "pip install numpy"  
 <br />
 &nbsp; AnyTree  
