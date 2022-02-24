@@ -7,35 +7,37 @@
 
 ### Dependencies:
 #### NumPy  
-&nbsp;&nbsp; download with "pip install numpy"  
+&nbsp; download with "pip install numpy"  
 <br />
-&nbsp; AnyTree  
-&nbsp;&nbsp; download with "pip install anytree"
+#### AnyTree  
+&nbsp; download with "pip install anytree"
 <br />
 <br />
-&nbsp; Distributed_Collaborative_Task_Tree
+#### Distributed_Collaborative_Task_Tree
 <br />
-&nbsp;&nbsp; code and instructions at https://github.com/UNR-RoboticsResearchLab/Distributed_Collaborative_Task_Tree
+&nbsp; code and instructions at https://github.com/UNR-RoboticsResearchLab/Distributed_Collaborative_Task_Tree
 <br />
-&nbsp;&nbsp; my code is in the 'taylor_while' branch; this where 'sequence_builder.cc' can be found
+&nbsp; my code is in the 'taylor_while' branch; this where 'sequence_builder.cc' can be found
 
 ### How to run:
-&nbsp; MainAlg-Copy1.py
+#### MainAlg-Copy1.py
 <br />
 &nbsp; This file is just an un-documented copy of Main_Documented.py.
 <br />
 
-&nbsp; Main_Documented.py
+#### Main_Documented.py
 <br />
 &nbsp; This is the main program that takes in 2 well-representative task sequences and outputs a corresponding hierarchical task tree. The trees that can be correctly reconstructed must have a root 'THEN' node and a maximum depth of 3; all nodes other than the root can be either 'AND' or 'OR'.
 <br />
 &nbsp;&nbsp; test.txt has a whole bunch of possible task sequences that have been used to test the accuracy of Main_Documented
 <br />
-&nbsp; MyTesting.py
+
+#### MyTesting.py
 <br />
 &nbsp; This file is an extension of Main_Documented that doesn't pass all tests. It's an attempt at constructing hierarchical task trees that include 'THEN' nodes outside of the root and trees with a larger depth than 3.
 <br />
-&nbsp; Main_testscript.py
+
+#### Main_testscript.py
 <br />
 &nbsp; This program allows Main_Documented to interface with sequence_builder.cc. The output file from sequence_builder.cc that contains observed task sequences can be inputted to this file so that they can be put into the right format to be entered into Main_Documented.py and the constructed hierarchical task tree can be displayed in the terminal.
 <br />
